@@ -9,4 +9,5 @@ public interface OrderDAO {
     Optional<Order> findById(Long id);
     List<Order> findByBuyer(Long buyerId);
     List<Order> findBySellerProducts(Long sellerId);
+    List<Order> findAll();
 }
