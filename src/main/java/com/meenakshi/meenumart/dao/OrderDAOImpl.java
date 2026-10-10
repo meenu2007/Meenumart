@@ -121,6 +121,24 @@ public class OrderDAOImpl implements OrderDAO {
         }
     }
 
+    @Override
+    public List<Order> findAll() {
+        String sql = "SELECT * FROM orders ORDER BY created_at DESC";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            List<Order> orders = new ArrayList<>();
+            while (rs.next()) {
+                Order order = mapRow(rs);
+                order.setItems(findItems(conn, order.getId()));
+                orders.add(order);
+            }
+            return orders;
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to find all orders", e);
+        }
+    }
+
     private List<OrderItem> findItems(Connection conn, Long orderId) throws SQLException {
         String sql = "SELECT oi.*, p.name AS product_name FROM order_items oi " +
                 "JOIN products p ON oi.product_id = p.id WHERE oi.order_id = ?";
